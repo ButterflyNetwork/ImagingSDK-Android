@@ -101,15 +101,12 @@ If you encounter any issues during the integration of the SDK, please refer to t
                    imagingState: ImagingState,
                    imagingStateChanges: ImagingStateChanges,
                ) {
-                   if (didStart) return
-                   didStart = true
-
-                   lifecycleScope.launch(imagingDispatcher) {
-                       // 3. Connect the simulated probe.
-                       imaging.connectSimulatedProbe()
-
-                       // 4. Start imaging.
-                       imaging.startImaging()
+                   // 4. Start imaging.
+                   if (!didStart && imagingState.probe.state == ProbeState.READY && imagingState.availablePresets.isNotEmpty()) {
+                       didStart = true
+                       lifecycleScope.launch(imagingDispatcher) {
+                           imaging.startImaging()
+                       }
                    }
 
                    // 5. Present image.
@@ -119,9 +116,12 @@ If you encounter any issues during the integration of the SDK, please refer to t
                }
            }
 
-           // 2. Start the SDK with your client key.
            lifecycleScope.launch(imagingDispatcher) {
+               // 2. Start the SDK with your client key.
                imaging.startup(clientKey = "CLIENT KEY")
+
+               // 3. Connect the simulated probe.
+               imaging.connectSimulatedProbe()
            }
        }
    }
@@ -130,7 +130,7 @@ If you encounter any issues during the integration of the SDK, please refer to t
 > [!NOTE]
 > Running all imaging operations on a single dedicated thread is recommended. See the [sample app](demo) for an example using a dedicated coroutine dispatcher.
 >
-> When using a physical probe instead of the simulated one, ensure the probe is ready and presets are available before calling `startImaging` by checking: `state.probe.state == ProbeState.READY && state.availablePresets.isNotEmpty()`. The connection is established automatically by plugging the probe into your Android device.
+> Ensure the probe is ready and presets are available before calling `startImaging` by checking: `state.probe.state == ProbeState.READY && state.availablePresets.isNotEmpty()`. The connection is established automatically by plugging the probe into your Android device.
 
 ## Sample App
 
