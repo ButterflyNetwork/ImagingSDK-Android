@@ -44,12 +44,14 @@ import kotlin.math.roundToInt
 @Composable
 internal fun PrimaryActionButton(
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     text: String,
     onClick: () -> Unit,
 ) {
     Button(
         modifier = modifier,
         onClick = onClick,
+        enabled = enabled,
     ) {
         Text(
             text = text,

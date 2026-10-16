@@ -47,12 +47,6 @@ To start using the SDK, please follow these steps:
        id("com.butterflynetwork.sdk.plugin.loader") version "<version>"
    }
    ```
-1. Add the following permission to your app's `AndroidManifest.xml`:
-   ```xml
-   <uses-permission android:name="android.permission.INTERNET" />
-   ```
-   > [!NOTE]
-   > This permission will be included automatically by the SDK in a future release.
 1. Sync and build your project.
 
 ## Troubleshooting

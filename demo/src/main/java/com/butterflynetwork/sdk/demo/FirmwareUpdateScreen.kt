@@ -12,12 +12,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.butterflynetwork.sdk.demo.ui.theme.ImagingSDKTheme
@@ -28,6 +30,7 @@ internal fun FirmwareUpdateScreen(
     updating: Boolean,
     progress: FirmwareUpdateProgress?,
     onUpdateFirmware: () -> Unit,
+    isBatteryTooLow: Boolean = false,
 ) {
     Column(
         modifier = Modifier
@@ -44,9 +47,18 @@ internal fun FirmwareUpdateScreen(
 
         if (!updating) {
             PrimaryActionButton(
+                enabled = !isBatteryTooLow,
                 text = "Update firmware",
                 onClick = onUpdateFirmware,
             )
+
+            if (isBatteryTooLow) {
+                Text(
+                    text = "Low probe battery. Charge your probe to 10% in order to update firmware.",
+                    color = MaterialTheme.colorScheme.error,
+                    textAlign = TextAlign.Center,
+                )
+            }
         } else {
             Text(text = "Updating firmware...")
 
@@ -82,6 +94,21 @@ private fun PreviewBeforeUpdate() {
                 updating = false,
                 progress = null,
                 onUpdateFirmware = {},
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewBeforeUpdateWithLowBattery() {
+    ImagingSDKTheme {
+        Surface {
+            FirmwareUpdateScreen(
+                updating = false,
+                progress = null,
+                onUpdateFirmware = {},
+                isBatteryTooLow = true,
             )
         }
     }

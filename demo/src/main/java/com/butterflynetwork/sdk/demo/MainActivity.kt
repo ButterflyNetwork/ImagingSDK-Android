@@ -37,4 +37,9 @@ class MainActivity : ComponentActivity() {
 
         viewModel.startup()
     }
+
+    override fun onStop() {
+        viewModel.onAppBackground()
+        super.onStop()
+    }
 }

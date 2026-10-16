@@ -17,6 +17,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+private const val FIRMWARE_UPDATE_MIN_BATTERY_PERCENTAGE = 0.1f
+
 @Composable
 fun ImagingScreen(viewModel: ImagingViewModel) {
     val imagingState = viewModel.imagingState
@@ -32,10 +34,12 @@ fun ImagingScreen(viewModel: ImagingViewModel) {
             }
 
             ImagingViewModel.Stage.FIRMWARE_UPDATE_NEEDED -> {
+                val batteryPercentage = viewModel.imagingState?.probe?.batteryPercentage ?: 0f
                 FirmwareUpdateScreen(
                     updating = viewModel.firmwareUpdating,
                     progress = viewModel.firmwareUpdateProgress,
                     onUpdateFirmware = { viewModel.updateFirmware() },
+                    isBatteryTooLow = batteryPercentage < FIRMWARE_UPDATE_MIN_BATTERY_PERCENTAGE,
                 )
             }
 

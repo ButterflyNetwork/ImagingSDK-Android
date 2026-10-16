@@ -23,6 +23,7 @@ import com.butterflynetwork.sdk.imaging.model.LogLevel
 import com.butterflynetwork.sdk.imaging.model.PlaneLocation
 import com.butterflynetwork.sdk.imaging.model.PresetParameters
 import com.butterflynetwork.sdk.imaging.model.ProbeState
+import com.butterflynetwork.sdk.imaging.model.StartImagingError
 import com.butterflynetwork.sdk.imaging.model.UltrasoundMode
 import com.butterflynetwork.sdk.imaging.model.ValidationError
 import kotlinx.coroutines.CoroutineDispatcher
@@ -246,7 +247,16 @@ class ImagingViewModel(application: Application) : AndroidViewModel(application)
 
         stage = Stage.STARTING_IMAGING
         runOnImagingDispatcher {
-            imaging.startImaging(preset, parameters)
+            try {
+                imaging.startImaging(preset, parameters)
+            } catch (e: ValidationError) {
+                // License key validation failed (bad key, expired, or network error).
+                errorMessage = e.message ?: "License validation failed."
+                Timber.e(e, "Failed to start up backend")
+            } catch (e: StartImagingError) {
+                errorMessage = e.message ?: "Failed: $e"
+                Timber.e(e, "Failed to start imaging")
+            }
         }
     }
 
@@ -352,6 +362,13 @@ class ImagingViewModel(application: Application) : AndroidViewModel(application)
                 }
             firmwareUpdating = false
             firmwareUpdateProgress = null
+        }
+    }
+
+    // Always stop imaging when app moves to background.
+    fun onAppBackground() {
+        if (stage in setOf(Stage.STARTING_IMAGING, Stage.IMAGING)) {
+            stopImaging()
         }
     }
 
